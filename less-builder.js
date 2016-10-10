@@ -95,6 +95,12 @@ define(['require', './normalize'], function(req, normalize) {
 
     //add to the buffer
     var cfg = _config.less || {};
+
+    if (cfg.compileSeparateFiles === false) {
+      lessBuffer[name] = '@import "' + fileUrl + '";\n';
+      return load();
+    }
+
     cfg.paths = [baseUrl];
     cfg.filename = fileUrl;
     cfg.async = false;
@@ -139,7 +145,28 @@ define(['require', './normalize'], function(req, normalize) {
   lessAPI.onLayerEnd = function(write, data) {
 
     //calculate layer css
-    var css = layerBuffer.join('');
+    var layerData = layerBuffer.join(''),
+        css;
+
+    var cfg = _config.less || {};
+    if (cfg.compileSeparateFiles === false) {
+      cfg.paths = [baseUrl];
+      cfg.async = false;
+      cfg.syncImport = true;
+      var parser = new less.Parser(cfg);
+      parser.parse(layerData, function(err, tree) {
+        if (err) {
+          throw new Error(err + ' at line ' + err.line);
+        }
+        css = tree.toCSS(config.less);
+        if (!config.separateCSS) {
+          css = normalize(css, config.baseUrl, siteRoot);
+        }
+      }, cfg);
+      do {} while (css === undefined);
+    } else {
+      css = layerData;
+    }
 
     if (config.separateCSS) {
       console.log('Writing CSS! file: ' + data.name + '\n');
