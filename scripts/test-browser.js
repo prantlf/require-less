@@ -15,6 +15,17 @@ function run(directories) {
   var directory = directories.shift(), url;
   if (directory) {
     url = 'file://' + cwd + '/test/' + directory + '/test.html';
+    runPage(url, function () {
+      url = 'file://' + cwd + '/test/' + directory + '/test-out.html';
+      runPage(url, function () {
+        run.call(null, directories);
+      });
+    });
+  } else {
+    phantom.exit(failed ? 1 : 0);
+  }
+
+  function runPage(url, callback) {
     console.log('> open ' + url);
     console.log('');
     page.open(url, function (status) {
@@ -32,14 +43,14 @@ function run(directories) {
             }
             console.log('Testing ' + bodyText + '.');
             console.log('');
-            run.call(null, directories);
+            callback();
           } else {
             if (++retries === 100) {
               clearInterval(interval);
               failed = true;
               console.error('Testing timed out.');
               console.log('');
-              run.call(null, directories);
+              callback();
             }
           }
         }, 10);
@@ -47,15 +58,15 @@ function run(directories) {
         failed = true;
         console.error('Opening failed.');
         console.log('');
-        run.call(null, directories);
+        callback();
       }
     });
-  } else {
-    phantom.exit(failed ? 1 : 0);
   }
 }
 
 run([
+  'support-csso-v1',
+  'support-csso-v2',
   'support-less-v1',
   'support-less-v2',
   'support-separate-css'

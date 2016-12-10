@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "devDependencies": {
+    "csso": "~2.3.0"
+  }
+}

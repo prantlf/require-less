@@ -3,7 +3,7 @@
   baseUrl: ".",
   mainConfigFile: "config.js",
   dir: "out",
-  fileExclusionRegExp: /(?:^build\.js$)|(?:lessc\.js$)|(?:\.less$)|(?:\.html$)/,
+  fileExclusionRegExp: /(?:^build\.js$)|(?:lessc\.js$)|(?:\.less$)|(?:\.html$)|(?:vendor)/,
 
   siteRoot: ".",
   separateCSS: true,
